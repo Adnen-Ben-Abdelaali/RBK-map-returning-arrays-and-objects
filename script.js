@@ -17,10 +17,13 @@ function map(collection, f) {
   let acc = new Object();
     if(Array.isArray(collection)) {
       let acc = new Array();
+      
     }
+    
       each(collection, function(element, index) {
         acc[index] = f(element, index);
       }); 
+    
 
     return acc;
 }
@@ -141,7 +144,7 @@ function agesToMinutes(arrayOfObjects) {
   return map(arrayOfObjects, function(element, index) {
     return map(element, function(elem, index) {
       if(index == "age") {
-        elem += 1;
+        elem *= 365 * 24 * 60;
       }
       return elem;
     });
@@ -186,16 +189,62 @@ Hint: Using Regular Expressions will make your life easier :)
 */
 function securityCheck(object) {
   objectCopied = new Object();
-  objectCopied = object;
-  objectCopied["user"]["flag"] = true;
-  objectCopied["user"]["passwordHealth"] = "";
-  return map(objectCopied, function(element) {
-    return map(element, function(elem, indx) {
-      return map(elem, function(value, key) {
-        if(key === "password") {
-          
-        }
-      });
-    }); 
+  let zeroToNine  = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+  let symbols = new Array( '&', '!', '~', '@', '"', '#', '{', '$', '(', '[', '-', '%', '`', '_', ')', ']', '+', '/', '*', '.', ',', '?', '§', '<', '>', 'µ', '£');
+  let letter = new Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+  let capitalLetter = new Array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+ //   console.log(capitalLetter);
+    let passwordHel = new Array('weak', 'normal', 'normal','strong');
+ /* let checkPasswordStrength = {"rExists": zeroToNine, "lExists" :symbols, "cExists" : capitalLetter, "tExits": letter};  */
+  let bringKeysBack = ["rExists", "lExists", "cExists", "tExits"];
+  let checkPasswordStrength = {"rExists": zeroToNine, "lExists" :symbols, "cExists" : capitalLetter};
+  return map(object, function(element, index) {
+    each(element, function(value, user) {
+     // console.log(value);
+      value["flag"] = false; 
+      value["passwordHealth"] = "weak";
+      let isThere = 0;
+      each (value, function(elem, index) {
+      
+        if( (index === "password") && (elem.length >= 8) ) {
+          value["flag"] = true;
+          isThere = 0;
+          for(let i = 0; i < elem.length; i++) {
+            for(let key in checkPasswordStrength) {
+              let takeIt = checkPasswordStrength[key];
+           //   console.log("checkPasswordStrength[key] = " + takeIt);
+              for(let j = 0; j < takeIt.length; j++) {
+              //  console.log("takeIt[j] = " + takeIt[j])
+                if(takeIt[j] === elem[i]) {
+                  checkPasswordStrength[key] = []; 
+                   console.log("key+ = " + key);
+                }
+              }
+            }
+          }
+          for(let key in checkPasswordStrength) {
+            let takeItagain = checkPasswordStrength[key];
+            if(takeItagain.length === 0) {
+              isThere++;
+              console.log("isThere = " + isThere);
+            } 
+          }
+          checkPasswordStrength = {"rExists": zeroToNine, "lExists" :symbols, "cExists" : capitalLetter};
+          value["passwordHealth"] = passwordHel[isThere];
+       }
+    });
+   console.log(value);  
+   return value;
   });
+  return element;
+});
 }
+
+
+
+var usersData = [ 
+  { user: {email: 'majd@rbk.org', password: '_majd(2017)'}}, 
+  { user: {email: 'fatema@rbk.org', password: '12345'}}, 
+  { user: {email: 'maher@rbk.org', password: 'M@her2017'}}, 
+  { user: {email: 'sahar@rbk.org', password: 'saher2017'}} 
+];
